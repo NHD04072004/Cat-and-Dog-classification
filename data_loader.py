@@ -21,7 +21,7 @@ def data_loader(input_dir, categories):
     return data, labels
 
 
-# x, y = data_loader('data', ['cat', 'dog'])
-#
+# x, y = data_loader('data/train', ['cats', 'dogs'])
+
 # print('data', x)
 # print('target', y)

@@ -1,0 +1,4 @@
+tensorflow
+tensorflow[and-cuda]
+numpy
+opencv-python
