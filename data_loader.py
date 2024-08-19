@@ -3,29 +3,23 @@ import numpy as np
 import cv2
 
 
-def process_data(img_path, target_size=(128, 128)):
-    img = cv2.imread(img_path)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = cv2.resize(img, target_size)
-    img = img.astype('float32') / 255.0
-    img = np.expand_dims(img, axis=0)
-    return img
+def data_loader(input_dir, categories):
+    data = []
+    labels = []
+    for category_idx, category in enumerate(categories):
+        for file in os.listdir(os.path.join(input_dir, category)):
+            img_path = os.path.join(input_dir, category, file)
+            img = cv2.imread(img_path)
+            img = cv2.resize(img, (128, 128))
+            data.append(img.flatten())
+            labels.append(category_idx)
+
+    data = np.asarray(data)
+    labels = np.asarray(labels)
+    return data, labels
 
 
-def img_loader(path_dir):
-    path_imgs = []
-    for img in os.listdir(path_dir):
-        path_img = path_dir + '/' + img
-        path_imgs.append(path_img)
-    return path_imgs
+x, y = data_loader('data', ['cat', 'dog'])
 
-
-def data_loader(path_dir):
-    imgs = []
-    for img in img_loader(path_dir):
-        img = process_data(img)
-        imgs.append(img)
-    return np.vstack(imgs)
-
-print(img_loader('data'))
-# print(data_loader('data'))
+print('data', x)
+print('target', y)
