@@ -19,8 +19,8 @@ x.add(tf.keras.layers.Dropout(0.2))
 x.add(tf.keras.layers.Dense(1, activation='sigmoid'))
 x.compile(
     loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
-    optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.1),
     metrics=['accuracy']
 )
-history = x.fit(x=data_train, y=labels_train, batch_size=8, epochs=100, validation_data=(data_test, labels_test))
+history = x.fit(x=data_train, y=labels_train, batch_size=4, epochs=10, validation_data=(data_test, labels_test))
 print(history)
