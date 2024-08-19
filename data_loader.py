@@ -11,7 +11,9 @@ def data_loader(input_dir, categories):
             img_path = os.path.join(input_dir, category, file)
             img = cv2.imread(img_path)
             img = cv2.resize(img, (128, 128))
-            data.append(img.flatten())
+            img = img.astype('float32') / 255.0
+            img = np.expand_dims(img, axis=0)
+            data.append(img)
             labels.append(category_idx)
 
     data = np.asarray(data)
@@ -19,7 +21,7 @@ def data_loader(input_dir, categories):
     return data, labels
 
 
-x, y = data_loader('data', ['cat', 'dog'])
-
-print('data', x)
-print('target', y)
+# x, y = data_loader('data', ['cat', 'dog'])
+#
+# print('data', x)
+# print('target', y)
