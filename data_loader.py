@@ -10,9 +10,10 @@ def data_loader(input_dir, categories):
         for file in os.listdir(os.path.join(input_dir, category)):
             img_path = os.path.join(input_dir, category, file)
             img = cv2.imread(img_path)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             img = cv2.resize(img, (128, 128))
             img = img.astype('float32') / 255.0
-            img = np.expand_dims(img, axis=0)
+            img = np.expand_dims(img, axis=-1)
             data.append(img)
             labels.append(category_idx)
 
