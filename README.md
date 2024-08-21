@@ -1,2 +1,3 @@
 ## Mô hình phân loại ảnh chó, mèo
-<img src='images/Screenshot.png' alt='scrsh'/> 
+
+## Sử dụng một mạng nơ-ron tích chập (Convolutional Neural Network - CNN) dùng để phân loại hình ảnh chó và mèo
