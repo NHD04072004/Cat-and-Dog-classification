@@ -10,21 +10,6 @@ data_train, labels_train = data_loader('data/train', ['cats', 'dogs'])
 data_test, labels_test = data_loader('data/test', ['cats', 'dogs'])
 
 x = tf.keras.Sequential()
-# x.add(tf.keras.layers.Conv2D(32, (3, 3), (1, 1), input_shape=(130, 130, 1)))
-# x.add(tf.keras.layers.BatchNormalization())
-# x.add(tf.keras.layers.Activation('relu'))
-# x.add(tf.keras.layers.MaxPooling2D((2, 2)))
-
-# x.add(tf.keras.layers.Conv2D(64, (3, 3), (1, 1)))
-# x.add(tf.keras.layers.BatchNormalization())
-# x.add(tf.keras.layers.Activation('relu'))
-# x.add(tf.keras.layers.MaxPooling2D((2, 2)))
-
-# x.add(tf.keras.layers.Conv2D(128, (3, 3), (1, 1)))
-# x.add(tf.keras.layers.BatchNormalization())
-# x.add(tf.keras.layers.Activation('relu'))
-# x.add(tf.keras.layers.MaxPooling2D((2, 2)))
-
 x.add(tf.keras.layers.Conv2D(64, (3, 3), (1, 1), input_shape=(128, 128, 1)))
 x.add(tf.keras.layers.BatchNormalization())
 x.add(tf.keras.layers.Activation('relu'))
@@ -46,16 +31,13 @@ x.add(tf.keras.layers.Activation('relu'))
 x.add(tf.keras.layers.MaxPooling2D((2, 2)))
 
 x.add(tf.keras.layers.Flatten())
-x.add(tf.keras.layers.Dense(512, activation='relu'))
-x.add(tf.keras.layers.Dropout(0.3))
-# x.add(tf.keras.layers.Dense(32, activation='relu'))
-# x.add(tf.keras.layers.Dropout(0.2))
+x.add(tf.keras.layers.Dense(1024, activation='relu'))
+x.add(tf.keras.layers.Dropout(0.5))
 x.add(tf.keras.layers.Dense(1, activation='sigmoid'))
 
 x.compile(
     loss=tf.keras.losses.BinaryCrossentropy(),
     optimizer=tf.keras.optimizers.Adam(),
-    metrics=['accuracy']
 )
 early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3)
 history = x.fit(x=data_train, y=labels_train, epochs=100, validation_data=(data_test, labels_test), callbacks=[early_stopping])
