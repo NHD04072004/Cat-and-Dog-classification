@@ -1,4 +1,4 @@
-tensorflow
+matplotlib
+scipy
 tensorflow[and-cuda]
-numpy
-opencv-python
+tensorflow==2.15.1
