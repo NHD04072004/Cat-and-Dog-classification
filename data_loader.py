@@ -1,28 +1,21 @@
-import os
-import numpy as np
-import cv2
+import tensorflow as tf
 
+def load_data(train_dir, val_dir, img_size=(150, 150), batch_size=32):
+    train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1./255)
+    val_datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1./255)
 
-def data_loader(input_dir, categories):
-    data = []
-    labels = []
-    for category_idx, category in enumerate(categories):
-        for file in os.listdir(os.path.join(input_dir, category)):
-            img_path = os.path.join(input_dir, category, file)
-            img = cv2.imread(img_path)
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            img = cv2.resize(img, (128, 128))
-            img = img.astype('float32') / 255.0
-            img = np.expand_dims(img, axis=-1)
-            data.append(img)
-            labels.append(category_idx)
+    train_generator = train_datagen.flow_from_directory(
+        train_dir,
+        target_size=img_size,
+        batch_size=batch_size,
+        class_mode='binary'
+    )
 
-    data = np.asarray(data)
-    labels = np.asarray(labels)
-    return data, labels
+    val_generator = val_datagen.flow_from_directory(
+        val_dir,
+        target_size=img_size,
+        batch_size=batch_size,
+        class_mode='binary'
+    )
 
-
-# x, y = data_loader('data/train', ['cats', 'dogs'])
-
-# print('data', x)
-# print('target', y)
+    return train_generator, val_generator

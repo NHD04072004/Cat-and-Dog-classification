@@ -1,79 +1,53 @@
 import tensorflow as tf
-from data_loader import data_loader
-import matplotlib
-matplotlib.use('Agg')
+from data_loader import load_data
+from model import build_model
+from arguments import get_args
 import matplotlib.pyplot as plt
-import pandas as pd
 
 
-data_train, labels_train = data_loader('data/train', ['cats', 'dogs'])
-data_test, labels_test = data_loader('data/test', ['cats', 'dogs'])
+def plot_training(history):
+    plt.figure(figsize=(12, 4))
+    plt.subplot(1, 2, 1)
+    plt.plot(history.history['accuracy'], label='Train Accuracy')
+    plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+    plt.title('Train vs Validation Accuracy')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend()
 
-x = tf.keras.Sequential()
-x.add(tf.keras.layers.Conv2D(64, (3, 3), (1, 1), input_shape=(128, 128, 1)))
-x.add(tf.keras.layers.BatchNormalization())
-x.add(tf.keras.layers.Activation('relu'))
-x.add(tf.keras.layers.MaxPooling2D((2, 2)))
+    plt.subplot(1, 2, 2)
+    plt.plot(history.history['loss'], label='Train Loss')
+    plt.plot(history.history['val_loss'], label='Validation Loss')
+    plt.title('Train vs Validation Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
 
-x.add(tf.keras.layers.Conv2D(128, (3, 3), (1, 1)))
-x.add(tf.keras.layers.BatchNormalization())
-x.add(tf.keras.layers.Activation('relu'))
-x.add(tf.keras.layers.MaxPooling2D((2, 2)))
-
-x.add(tf.keras.layers.Conv2D(256, (3, 3), (1, 1)))
-x.add(tf.keras.layers.BatchNormalization())
-x.add(tf.keras.layers.Activation('relu'))
-x.add(tf.keras.layers.MaxPooling2D((2, 2)))
-
-x.add(tf.keras.layers.Conv2D(512, (3, 3), (1, 1)))
-x.add(tf.keras.layers.BatchNormalization())
-x.add(tf.keras.layers.Activation('relu'))
-x.add(tf.keras.layers.MaxPooling2D((2, 2)))
-
-x.add(tf.keras.layers.Flatten())
-x.add(tf.keras.layers.Dense(1024, activation='relu'))
-x.add(tf.keras.layers.Dropout(0.5))
-x.add(tf.keras.layers.Dense(1, activation='sigmoid'))
-
-x.compile(
-    loss=tf.keras.losses.BinaryCrossentropy(),
-    optimizer=tf.keras.optimizers.Adam(),
-)
-early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3)
-history = x.fit(x=data_train, y=labels_train, epochs=100, validation_data=(data_test, labels_test), callbacks=[early_stopping])
-test_loss, test_acc = x.evaluate(data_test, labels_test)
-print(test_acc)
-print(test_loss)
-
-history_df = pd.DataFrame(history.history)
-history_df.to_csv('training_history.csv', index=False)
-
-x.save('models', 'cat_dog_cls.h5')
+    plt.tight_layout()
+    plt.show()
 
 
-## plot
-history_dict = history.history
+def train():
+    args = get_args()
+    train_generator, val_generator = load_data(args.train_dir, args.val_dir, args.img_size, args.batch_size)
+    model = build_model((*args.img_size, 3))
 
-plt.figure(figsize=(12, 5))
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=args.learning_rate),
+                  loss='binary_crossentropy',
+                  metrics=['accuracy'])
 
-# accuracy
-plt.subplot(1, 2, 1)
-plt.plot(history_dict['accuracy'], label='Training Accuracy')
-plt.plot(history_dict['val_accuracy'], label='Validation Accuracy')
-plt.title('Accuracy')
-plt.xlabel('Epochs')
-plt.ylabel('Accuracy')
-plt.legend()
+    history = model.fit(
+        train_generator,
+        steps_per_epoch=train_generator.samples // args.batch_size,
+        epochs=args.epochs,
+        validation_data=val_generator,
+        validation_steps=val_generator.samples // args.batch_size
+    )
 
-# loss
-plt.subplot(1, 2, 2)
-plt.plot(history_dict['loss'], label='Training Loss')
-plt.plot(history_dict['val_loss'], label='Validation Loss')
-plt.title('Loss')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
-plt.legend()
+    model.save(args.model_save_path)
+    
+    plot_training(history)
 
-plt.savefig('training_history.png')
 
-# plt.show()
+if __name__ == "__main__":
+    train()
