@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat vs Dog Classifier</title>
+    <style>
+        body{
+            display: flex;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .commit_pic{
+            background-color: rgb(188, 231, 217);
+            width: 500px;
+            height: 200px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            border-radius: 15px;
+        }
+
+        .btnCommit{
+            cursor: pointer;
+            border-radius: 3px;
+            width: 80px;
+            height: 31px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body> 
+    <div class="commit_pic">
+        <form action="/predict" method="post" enctype="multipart/form-data">
+            <h1>Cat vs Dog Classifier</h1>
+            <input type="file" name="file">
+            <input type="submit" value="Commit" class="btnCommit">
+            <p></p>
+        </form>
+    </div>
+</body>
+</html>
