@@ -1,23 +1,44 @@
+import requests
+from flask import Flask, render_template, request, jsonify
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras.preprocessing import image
-from arguments import get_args
+from tensorflow.keras.models import load_model
 
-def predict(img_path, model_path, img_size):
-    model = tf.keras.models.load_model(model_path)
 
-    img = image.load_img(img_path, target_size=img_size)
+def preprocess_image(img_path, target_size):
+    img = image.load_img(img_path, target_size=target_size)
     img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0) / 255.0
+    img_scale = np.expand_dims(img_array, axis=0) / 255.0
+    return img_scale
 
-    prediction = model.predict(img_array)
-    if prediction[0] > 0.5:
-        return 'dog'
-    else:
-        return 'cat'
+app = Flask(__name__)
+
+model = load_model('model/cats_dogs_cls.h5')
+# image = preprocess_image('datasets/val/dogs/dog.5.jpg', target_size=(128, 128))
+# prediction = model.predict(image)
+# print(prediction[0][0])
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    if 'file' not in request.files:
+        return "No file part"
+    file = request.files['file']
+    if file.filename == '':
+        return "No selected file"
+    if file:
+        # Preprocess the image
+        image = preprocess_image(file, target_size=(128, 128))
+
+        # Make prediction
+        prediction = model.predict(image)
+        predicted_class = "Dog" if prediction[0][0] > 0.5 else "Cat"
+
+        return jsonify({'prediction': predicted_class})
 
 if __name__ == '__main__':
-    args = get_args()
-    img_path = input("Enter the path to the image: ")
-    result = predict(img_path, args.model_save_path, args.img_size)
-    print(f'The image is a {result}.')
+    app.run(debug=True)
