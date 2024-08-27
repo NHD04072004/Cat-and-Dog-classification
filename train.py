@@ -24,6 +24,7 @@ def plot_training(history):
     plt.legend()
 
     plt.tight_layout()
+    plt.savefig('image/cats_dogs_cls.png')
     plt.show()
 
 
