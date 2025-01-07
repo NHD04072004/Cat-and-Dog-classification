@@ -1,5 +1,5 @@
 env
 .idea
-datasets
-model
 datasource
+animal_board
+trained_models
