@@ -4,3 +4,4 @@ matplotlib
 tensorboard
 tqdm
 scikit-learn
+cv2

@@ -18,12 +18,13 @@ def get_args():
     parser = argparse.ArgumentParser(description="dogs and cats classification")
     parser.add_argument("--data_path", "-d", type=str, default="datasource")
     parser.add_argument("--image_size", "-i", type=int, default=224)
-    parser.add_argument("--batch_size", "-b", type=int, default=16)
+    parser.add_argument("--batch_size", "-b", type=int, default=32)
     parser.add_argument("--lr", "-lr", type=float, default=0.001)
     parser.add_argument("--resume", "-r", type=bool, default=False)
-    parser.add_argument("--epochs", "-e", type=int, default=100)
+    parser.add_argument("--epochs", "-e", type=int, default=5)
     parser.add_argument("--checkpoint_dir", "-c", type=str, default="trained_models")
     parser.add_argument("--tensorboard_dir", "-t", type=str, default="animal_board")
+    # parser.add_argument("--momentum", "-m", type=float, default=0.9)
 
     args = parser.parse_args()
     return args
@@ -74,6 +75,7 @@ def train(args):
     model.fc = nn.Linear(model.fc.in_features, 2)
     model.to(device)
     optimizer = optim.SGD(model.parameters(), lr=args.lr)
+    # lr_scheduler = optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=2, gamma=0.1)
     criterion = nn.CrossEntropyLoss()
 
     if args.resume:
@@ -113,6 +115,7 @@ def train(args):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            # lr_scheduler.step()
 
         """Validation"""
         model.eval()
@@ -124,7 +127,7 @@ def train(args):
             all_labels.extend(labels)
             images, labels = images.to(device), labels.to(device)
             outputs = model(images)
-            predictions = torch.argmax(outputs, dim=1)
+            _, predictions = torch.max(outputs, 1)
             all_predictions.extend(predictions.tolist())
             loss = criterion(outputs, labels)
             losses.append(loss.item())
